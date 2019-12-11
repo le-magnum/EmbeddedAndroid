@@ -1,0 +1,12 @@
+miracle\list.o: ../Middlewares/Third_Party/FreeRTOS/Source/list.c
+miracle\list.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+miracle\list.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
+miracle\list.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+miracle\list.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+miracle\list.o: ../Inc/FreeRTOSConfig.h
+miracle\list.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
+miracle\list.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
+miracle\list.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
+miracle\list.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3/portmacro.h
+miracle\list.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
+miracle\list.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h

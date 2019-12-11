@@ -1,0 +1,29 @@
+osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+defaultTaskHandle = osThreadCreate(osThread(task), $
+
+
+
+
+
+
+
+
+
+it.c -> sys tic
+
+
+
+main ->
+
+	StartDefaultTask(...) {
+	static uint16_t test = 0;
+		while(1) {
+			i++;
+			osDelay(1);
+				}
+	}
+
+
+osKernelStart();
+
+https://wiki.ai-thinker.com/esp8266/sdk

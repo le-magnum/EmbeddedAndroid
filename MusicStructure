@@ -1,0 +1,34 @@
+响铃时间 时：分：秒
+AlertTime  hour:minute:second
+occupy 3 bytes
+占三个字节
+
+
+响铃时长：2字节  分 秒
+Duration   2 bytes   minute  second
+
+from  monday to sunday  
+xxxxxxx+bit0    1byte
+bit0 means play single music or play directory
+星期一到星期日+播放方式 占1字节
+bit7  bit6 bit5  bit4 bit3 bit2 bit1 bit0
+bit0=1 目录播放   directory play mode
+bit0=0 文件播放  single file play mode
+
+music directory all together 18 bytes
+音乐目录 18字节
+
+typedef struct {
+ RTC_TimeTypeDef AlertTime;	//闹铃时间  3 byte
+uint8_t  minuteSpan;//响铃时长：分钟     1byte
+uint8_t  secondSpan;//响铃时长：秒       1byte
+uint8_t weekSelect;//前面7位是星期几选择	最低位是播放方式        1byte
+char musicDir[18]; //音乐目录	        18byte 
+	
+}recordStruct;
+
+
+
+
+total   24 bytes
+总共24字节

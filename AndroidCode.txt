@@ -1,0 +1,147 @@
+private void sendToSTM32_Click(object sender, EventArgs e)
+        {
+            int i;
+            String temp;
+            byte[] byteArray = new byte[50];
+            if (checkError() == -1)
+                return;            //获取时间
+            System.DateTime currentTime = new System.DateTime();
+            currentTime = System.DateTime.Now;//取当前年月日时分秒             Regex reg = new Regex(@"(^[0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]");
+            MyData output = new MyData();
+            DataTable dt = GetDgvToTable(dataGridView1);
+            byte[] out1 = new byte[30];            int nm = 25;
+            if (stm32UsbDevice == null)
+            {
+                MessageBox.Show("USB线没有连接");
+                return;
+            }
+            {
+                if (stm32UsbDevice.IsOpen)
+                { //  WR.Write(out1, 1000, out nm);
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        Array.Clear(out1, 0, 25);
+                        for (i = 0; i < dt.Columns.Count; i++)
+                            ;// myBuilder.Append(dr[i].ToString() + ",");
+                        if (dr[0].ToString() == "")
+                            break;
+                        out1[0] = Convert.ToByte((dr[0]).ToString());                        temp = dr[2].ToString(); //取得时：分
+                        string[] sArray = temp.Split(':');
+                        out1[1] = Byte.Parse(sArray[0]); //转变为字节类型整数
+                        out1[2] = Byte.Parse(sArray[1]);
+                        out1[3] = 0;//秒 保留功能                        temp = dr[3].ToString(); //取得文件名
+                        sArray = temp.Split(':');
+                        temp = sArray[1].ToString().Replace("\\", "/");
+                        string[] sArray2 = temp.Split('/'); //取得音乐路径                        if (sArray2.Length == 3)
+                        {
+                            //表示存在目录
+                            temp = ReformatStr(sArray2[1], 8);
+                            if (IsHanZi(temp) == false)
+                                temp = temp.ToUpper();//播放器集成电路要求必须大写英文
+                            temp = ReformatStr(temp, 8);//超过8个字节截取 不足补充空格
+                            byteArray = System.Text.Encoding.Default.GetBytes(temp);
+                            out1[7] = (byte)'/';
+                            for (int j = 0; j < 8; j++)
+                                out1[8 + j] = byteArray[j];                            temp = ReformatStr(sArray2[2], 8);
+                            string[] temp2 = temp.Split('.');
+                            temp = "";
+                            temp = String.Copy(temp2[0]);
+                            if (IsHanZi(temp) == false)
+                                temp = temp.ToUpper();//播放器集成电路要求必须大写英文
+                            temp = ReformatStr(temp, 8);
+                            byteArray = System.Text.Encoding.Default.GetBytes(temp);
+                            out1[16] = (byte)'/';
+                            for (int j = 0; j < 8; j++)
+                                out1[7 + 10 + j] = byteArray[j];
+                        }
+                        else
+                        {
+                            temp = ReformatStr(sArray2[1], 8);//超过8个字节截取 不足补充空格
+                            if (IsHanZi(temp) == false)
+                                temp = temp.ToUpper();//播放器集成电路要求必须大写英文                            string[] temp2 = temp.Split('.');
+                            temp = "";
+                            temp = String.Copy(temp2[0]);
+                            temp = ReformatStr(temp, 8);//超过8个字节截取 不足补充空格
+                            byteArray = System.Text.Encoding.Default.GetBytes(temp);
+                            for (int j = 0; j < 8; j++)
+                                out1[7 + j] = byteArray[j];
+                        } //没有目录
+                        temp = dr[4].ToString(); //取得分
+                        out1[4] = Byte.Parse(temp);
+                        temp = dr[5].ToString(); //取得秒
+                        out1[5] = Byte.Parse(temp);
+                        out1[6] = 0;
+                        if (dr[6].ToString() == "开") //取得周一状态
+                            out1[6] |= 0x80;
+                        if (dr[7].ToString() == "开")//取得周二状态
+                            out1[6] |= 0x40;
+                        if (dr[8].ToString() == "开")//取得周三状态
+                            out1[6] |= 0x20;
+                        if (dr[9].ToString() == "开")//取得周四状态
+                            out1[6] |= 0x10;
+                        if (dr[10].ToString() == "开")//取得周五状态
+                            out1[6] |= 0x08;
+                        if (dr[11].ToString() == "开")//取得周六状态
+                            out1[6] |= 0x04;
+                        if (dr[12].ToString() == "开")//取得周日状态
+                            out1[6] |= 0x02;
+                        if (dr[13].ToString() == "目录播放")//取得目录还是文件播放状态
+                            out1[6] |= 0x01;
+                        WR.Write(out1, 1000, out nm);                    }
+                    if (ssid != null)
+                    {
+                        //发送wifi参数
+                        byte[] byteArray2 = new Byte[100];
+                        Array.Clear(out1, 0, 25);
+                        out1[0] = 0xfc;//0xfc表示wifi设置ssid名
+                        byteArray2 = System.Text.Encoding.Default.GetBytes(ssid);
+                        for (i = 0; i < ssid.Length; i++)
+                        {
+                            out1[1 + i] = byteArray2[i];                        }
+                        WR.Write(out1, 1000, out nm);//发送ssid                        Array.Clear(out1, 0, 25);
+                        out1[0] = 0xfd;//0xfd表示wifi设置密码                        password = password.TrimEnd();
+                        byteArray2 = System.Text.Encoding.Default.GetBytes(password);
+                        for (i = 0; i < password.Length; i++)
+                        {
+                            out1[1 + i] = byteArray2[i];                        }
+                        WR.Write(out1, 1000, out nm);//发送密码
+                    }                    //写时间参数 将pc机的时间发到下位机
+                    out1[0] = 0xfe;//0xfe表示写时间
+                    out1[1] = (Byte)(currentTime.Year - 2000);
+                    out1[2] = (Byte)currentTime.Month;
+                    out1[3] = (Byte)currentTime.Day;
+                    out1[4] = (Byte)currentTime.Hour;
+                    out1[5] = (Byte)currentTime.Minute;
+                    out1[6] = (Byte)currentTime.Second;                    int myhex, myBCD; //下位机时间用BCD表示，这里应该转换
+                    for (i = 1; i < 7; i++)
+                    {
+                        myhex = out1[i];
+                        myBCD = (Byte)(myhex / 10 * 16) + (myhex % 10);
+                        out1[i] = (byte)myBCD;
+                    }
+                    WR.Write(out1, 1000, out nm);//发送时间                    out1[0] = 0xfb;//0xfb表示系统硬件设置
+                    out1[1] = 0;
+                    if (radioButton_wifi.Checked == true)
+                    {
+                        out1[1] = 0x1;//ESP8266
+                    }
+                    else if (radioButton_chinamobile.Checked == true)
+                    {
+                        out1[1] = 0x2;//ChinaMobile
+                    }
+                    else if (radiobutton_noModule.Checked == true)
+                    {
+                        out1[1] = 0x0;
+                    }
+                    else if (radioButton_GPS.Checked == true)
+                    {
+                        out1[1] = 0x3;//GPS模块
+                    }                    WR.Write(out1, 1000, out nm);                    //发送配置信息                    out1[0] = 0xff;
+                    WR.Write(out1, 1000, out nm);
+                }
+                else
+                {
+                    MessageBox.Show("USB线没有连接");
+                    return;
+                }
+            }        }
