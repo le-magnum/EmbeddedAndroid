@@ -36,16 +36,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onCreateAlarmButton(View view){
-        EditText editText = findViewById(R.id.editText3);
-        EditText editText2 = findViewById(R.id.editText4);
+        EditText editText = findViewById(R.id.alarmLenght);
+        EditText editText2 = findViewById(R.id.editText6);
         TextView textView = findViewById(R.id.TestField);
 
-        textView.setText("");
 
         int hours = Integer.parseInt(editText.getText().toString());
         int minutes = Integer.parseInt(editText2.getText().toString());
 
-        textView.append("Alarm created at " + hours + ":" + minutes );
+        textView.append("\nAlarm created at " + hours + ":" + minutes );
 
 
 
